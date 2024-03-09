@@ -1,12 +1,13 @@
 import datetime
 
-from flask import Flask, render_template, redirect, request
+from flask import Flask, render_template, redirect, request, make_response, jsonify
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data import db_session
 from data.users import User
 from data.jobs import Jobs
 from forms.job import JobAddForm
 from forms.user import LoginForm, RegisterForm
+from data import jobs_api
 
 app = Flask(__name__)
 login_manager = LoginManager()
@@ -98,8 +99,19 @@ def logout():
     return redirect("/")
 
 
+@app.errorhandler(400)
+def bad_request(_):
+    return make_response(jsonify({'error': 'Bad Request'}), 400)
+
+
+@app.errorhandler(404)
+def not_found(_):
+    return make_response(jsonify({'error': 'Not found'}), 404)
+
+
 def main():
     db_session.global_init('db/blogs.db')
+    app.register_blueprint(jobs_api.blueprint)
     app.run(debug=True)
 
 
