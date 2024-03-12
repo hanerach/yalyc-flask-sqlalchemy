@@ -7,8 +7,8 @@ class JobAddForm(FlaskForm):
     team_leader = IntegerField('Руководитель (id)', validators=[DataRequired()])
     job = StringField('Название работы', validators=[DataRequired()])
     work_size = IntegerField('Время на выполнение (в часах)', validators=[DataRequired()])
-    collaborators = StringField('Коллабораторы (id через запятую)', validators=[DataRequired()])
-    start_date = DateField('Начало работы')
+    collaborators = StringField('Коллабораторы (id через запятую)')
+    start_date = DateField('Начало работы', validators=[DataRequired()])
     end_date = DateField('Конец работы')
     is_finished = BooleanField('Работа закончена?')
 

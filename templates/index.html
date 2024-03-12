@@ -26,20 +26,21 @@
             {% endif %}
         </tr>
     </table>
-    {% for item in jobs %}
-    {% if current_user.is_authenticated and current_user == item.user %}
+    {% if current_user.is_authenticated and (current_user == job.user or current_user == 1) %}
     <div>
-        <a href="/jobs/{{ item.id }}" class="btn btn-warning">
+        <a href="/jobs/{{ job.id }}" class="btn btn-warning">
             Изменить
         </a>
-        <a href="/jobs/{{ item.id }}" class="btn btn-danger">
+        <a href="/jobs_delete/{{ job.id }}" class="btn btn-danger">
             Удалить
         </a>
     </div>
 {% endif %}
-    {% endfor %}
 </div>
 <br>
+
 {% endfor %}
+{% if current_user.is_authenticated %}
 <a style="margin-left: 20px" class="btn btn-primary" href="/add_job">Добавить работу</a>
+{% endif %}
 {% endblock %}

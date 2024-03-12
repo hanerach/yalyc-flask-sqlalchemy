@@ -18,6 +18,53 @@ app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 api = Api(app)
 
 
+@app.route('/jobs_delete/<int:job_id>', methods=['GET', 'POST'])
+@login_required
+def job_delete(job_id):
+    db_sess = db_session.create_session()
+    job = db_sess.query(Jobs).filter(Jobs.id == job_id, ((Jobs.user == current_user) | (current_user == 1))).first()
+    if job:
+        db_sess.delete(job)
+        db_sess.commit()
+    else:
+        abort(404)
+    return redirect('/')
+
+
+@app.route('/jobs/<int:job_id>', methods=['GET', 'POST'])
+@login_required
+def edit_news(job_id):
+    form = JobAddForm()
+    if request.method == "GET":
+        db_sess = db_session.create_session()
+        job = db_sess.query(Jobs).filter(Jobs.id == job_id, ((Jobs.user == current_user) | (current_user == 1))).first()
+        if job:
+            form.team_leader.data = job.team_leader
+            form.job.data = job.job
+            form.work_size.data = job.work_size
+            form.collaborators.data = job.collaborators
+            form.start_date.data = job.start_date
+            form.end_date.data = job.end_date
+            form.is_finished.data = job.is_finished
+        else:
+            abort(404)
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        job = db_sess.query(Jobs).filter(Jobs.id == job_id, Jobs.user == current_user).first()
+        if job:
+            job.team_leader = form.team_leader.data
+            job.job = form.job.data
+            job.work_size = form.work_size.data
+            job.collaborators = form.collaborators.data
+            job.start_date = form.start_date.data
+            job.end_date = form.end_date.data
+            job.is_finished = form.is_finished.data
+            db_sess.commit()
+            return redirect('/')
+        else:
+            abort(404)
+    return render_template('job.html', title='Редактирование новости', form=form)
+
 
 @login_manager.user_loader
 def load_user(user_id):
