@@ -2,7 +2,9 @@ import datetime
 
 from flask import Flask, render_template, redirect, request, make_response, jsonify
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from data import db_session
+from flask_restful import reqparse, abort, Api, Resource
+
+from data import db_session, users_resources
 from data.users import User
 from data.jobs import Jobs
 from forms.job import JobAddForm
@@ -13,6 +15,8 @@ app = Flask(__name__)
 login_manager = LoginManager()
 login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
+api = Api(app)
+
 
 
 @login_manager.user_loader
@@ -49,7 +53,7 @@ def add_job():
     form = JobAddForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
-        jobs = JobAddForm()
+        jobs = Jobs()
         jobs.team_leader = form.team_leader.data
         jobs.job = form.job.data
         jobs.work_size = form.work_size.data
@@ -112,6 +116,9 @@ def not_found(_):
 def main():
     db_session.global_init('db/blogs.db')
     app.register_blueprint(jobs_api.blueprint)
+    api.add_resource(users_resources.UsersListResource, '/api/v2/users')
+    api.add_resource(users_resources.UsersResource, '/api/v2/users/<int:user_id>')
+
     app.run(debug=True)
 
 
